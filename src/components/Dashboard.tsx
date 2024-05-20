@@ -27,9 +27,13 @@ import {
     SidebarItem,
     DashboardContent,
     FilterContainer,
-    ChartContainer
+    ChartContainer,
 } from './styles.tsx';
-import { Dashboard as DashboardIcon, Analytics as AnalyticsIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import {
+    Dashboard as DashboardIcon,
+    Analytics as AnalyticsIcon,
+    Settings as SettingsIcon,
+} from '@mui/icons-material';
 
 ChartJS.register(
     LineElement,
@@ -42,8 +46,41 @@ ChartJS.register(
     TimeScale
 );
 
+interface ActivityMeta {
+    label: string;
+    fillColor: string;
+}
+
+interface ActivityItem {
+    count: string;
+    label: string;
+    fillColor: string;
+}
+
+interface DayWiseActivity {
+    date: string;
+    items: {
+        children: ActivityItem[];
+    };
+}
+
+interface ActivityRow {
+    name: string;
+    totalActivity: ActivityItem[];
+    dayWiseActivity: DayWiseActivity[];
+}
+
+interface AuthorWorklog {
+    activityMeta: ActivityMeta[];
+    rows: ActivityRow[];
+}
+
+interface ActivityData {
+    AuthorWorklog: AuthorWorklog;
+}
+
 const Dashboard: React.FC = () => {
-    const [data, setData] = useState<any | null>(null);
+    const [data, setData] = useState<ActivityData | null>(null);
     const [filter, setFilter] = useState<string | null>(null);
 
     useEffect(() => {
@@ -58,13 +95,13 @@ const Dashboard: React.FC = () => {
         setFilter(selectedOption ? selectedOption.value : null);
     };
 
-    const getFilteredData = (data: any, filter: string) => {
+    const getFilteredData = (data: ActivityData, filter: string | null) => {
         if (!filter) return data;
         return {
             ...data,
             AuthorWorklog: {
                 ...data.AuthorWorklog,
-                rows: data.AuthorWorklog.rows.filter((row: any) => row.name === filter),
+                rows: data.AuthorWorklog.rows.filter(row => row.name === filter),
             },
         };
     };
@@ -76,14 +113,14 @@ const Dashboard: React.FC = () => {
     }
 
     const { activityMeta, rows } = filteredData.AuthorWorklog;
-    const developers = data?.AuthorWorklog.rows.map((row: any) => row.name) || [];
+    const developers = data?.AuthorWorklog.rows.map(row => row.name) || [];
 
     const chartData: ChartData<'line'> = {
-        labels: rows[0].dayWiseActivity.map((activity: any) => activity.date),
-        datasets: activityMeta.map((meta: any) => ({
+        labels: rows[0].dayWiseActivity.map(activity => activity.date),
+        datasets: activityMeta.map(meta => ({
             label: meta.label,
-            data: rows[0].dayWiseActivity.map((day: any) => {
-                const activity = day.items.children.find((item: any) => item.label === meta.label);
+            data: rows[0].dayWiseActivity.map(day => {
+                const activity = day.items.children.find(item => item.label === meta.label);
                 return activity ? parseInt(activity.count, 10) : 0;
             }),
             borderColor: meta.fillColor,
@@ -142,10 +179,10 @@ const Dashboard: React.FC = () => {
                     </SidebarItem>
                 </Sidebar>
                 <DashboardContent>
-                    <h1 style={{ textAlign: "center" }}>Developer Activity Dashboard</h1>
+                    <h1>Developer Activity Dashboard</h1>
                     <FilterContainer>
                         <Select
-                            options={developers.map((dev: string) => ({ value: dev, label: dev }))}
+                            options={developers.map(dev => ({ value: dev, label: dev }))}
                             isClearable
                             onChange={handleFilterChange}
                             placeholder="Filter by developer"
