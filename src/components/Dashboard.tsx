@@ -179,7 +179,7 @@ const Dashboard: React.FC = () => {
                     </SidebarItem>
                 </Sidebar>
                 <DashboardContent>
-                    <h1>Developer Activity Dashboard</h1>
+                    <h1 style={{ textAlign: "center" }}>Developer Activity Dashboard</h1>
                     <FilterContainer>
                         <Select
                             options={developers.map(dev => ({ value: dev, label: dev }))}
