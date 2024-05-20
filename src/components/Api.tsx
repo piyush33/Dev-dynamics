@@ -2567,7 +2567,7 @@ const FetchData = () => {
 
     setTimeout(() => {
       resolve(CurrentData);
-    }, 3000)
+    }, 100)
   })
 }
 
